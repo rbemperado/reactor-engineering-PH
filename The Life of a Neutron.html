@@ -1,0 +1,176 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>The Life of a Neutron</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Ctext y='8.5' font-size='9'%3E⚛️%3C/text%3E%3C/svg%3E">
+<style>
+:root{--bg:#fbfaf6;--fg:#1d2024;--mut:#5c626b;--card:#fff;--ln:#d8d9d3;--acc:#c0392b;--wat:#cde6f4;--fuel:#e8e2d0;--b:#2f6db5;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light dark}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14161a;--fg:#e8e9ea;--mut:#9aa1ab;--card:#1d2026;--ln:#343841;--wat:#1f3d52;--fuel:#3a362b;--b:#6aa6ec;--acc:#ef6a5a}}
+:root[data-theme="dark"]{--bg:#14161a;--fg:#e8e9ea;--mut:#9aa1ab;--card:#1d2026;--ln:#343841;--wat:#1f3d52;--fuel:#3a362b;--b:#6aa6ec;--acc:#ef6a5a;color-scheme:dark}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;flex-direction:column}
+header,footer{display:flex;align-items:center;gap:10px;padding:10px 16px;justify-content:space-between}
+header{border-bottom:1px solid var(--ln);font-weight:600}footer{border-top:1px solid var(--ln)}
+main{flex:1;overflow:auto;padding:18px 16px}
+.slide{display:none;max-width:1020px;margin:0 auto}
+.slide.on{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:22px;animation:f .35s}
+@media(max-width:760px){.slide.on{grid-template-columns:1fr}}
+@keyframes f{from{opacity:0;transform:translateY(8px)}}
+h2{font-size:1.5rem;margin:.1em 0 .5em;line-height:1.2}
+canvas{width:100%;height:auto;background:var(--card);border:1px solid var(--ln);border-radius:10px;display:block}
+button,select{font:inherit;padding:7px 14px;border-radius:8px;border:1px solid var(--ln);background:var(--card);color:var(--fg);cursor:pointer}
+button.p{background:var(--acc);border-color:var(--acc);color:#fff}button:disabled{opacity:.4;cursor:default}
+.mut{color:var(--mut);font-size:.9rem}ul{padding-left:1.1em}li{margin:.35em 0}
+.dots{display:flex;gap:7px}.dots i{width:11px;height:11px;border-radius:50%;background:var(--ln);cursor:pointer}.dots i.on{background:var(--acc)}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;align-items:center}
+.bar{height:12px;background:var(--b);border-radius:4px;margin:2px 0 8px}
+#grid{display:grid;grid-template-columns:repeat(20,1fr);gap:4px;max-width:440px;margin:8px 0}#grid i{aspect-ratio:1;border-radius:50%}
+table{border-collapse:collapse;width:100%;font-size:.88rem}td,th{padding:3px 6px;border-bottom:1px solid var(--ln);text-align:left}
+#lg{white-space:pre;font:12px/1.5 ui-monospace,Menlo,monospace;color:var(--mut);min-height:9em;overflow:hidden}
+input[type=range]{width:100%}
+#rgp h3{margin:.2em 0 .5em;font-size:1.05rem}#rgp h4{margin:1.2em 0 .4em;font-size:.95rem}
+</style></head><body>
+<header><span>⚛️ The Life of a Neutron</span><span class="mut" id="pg"></span></header>
+<main>
+<section class="slide on"><div>
+<h2>1 · Birth: a neutron is born in fission</h2>
+<ul><li>A <b>slow (thermal) neutron</b> (0.025 eV, ~2.2 km/s) is absorbed by U-235 → unstable U-236*.</li>
+<li>It splits into two fragments and <b>~2.4 prompt neutrons</b> on average, plus ~200 MeV of energy.</li>
+<li>Those neutrons are born <b>fast</b>: ~2 MeV on average, ~20,000 km/s (≈6% of light speed), roughly 10 million times the energy of a thermal neutron.</li></ul>
+<div class="row"><button class="p" id="fire">Fire neutron ▶</button></div><p class="mut" id="cap1"></p></div>
+<canvas id="c1" width="720" height="360"></canvas></section>
+
+<section class="slide"><div>
+<h2>2 · The problem: a sea of U-238</h2>
+<p>In 5% enriched fuel, 95 of every 100 uranium atoms are U-238 (each 1 dot = 1 atom; <span style="color:#d63a2a">red = U-235</span>).</p><div id="grid"></div>
+<ul><li>U-238 only fissions above ~1 MeV, and even then rarely.</li>
+<li>Fast neutrons hit U-235 with tiny odds (σ ≈ 1 barn).</li>
+<li>Heavy nuclei barely slow a neutron: an elastic hit on U-238 costs under 1% of its energy.</li></ul></div>
+<div><h3 style="margin-top:0">Collisions to slow 2 MeV → 0.025 eV</h3><div class="mut">log scale</div>
+<div id="cols"></div>
+<p>Light nuclei act like billiard balls of equal mass: hydrogen can take nearly all the energy in one hit. That is why reactors surround fuel with <b>water</b>.</p></div></section>
+
+<section class="slide"><div>
+<h2>3 · Why slow neutrons win</h2>
+<p>Same fuel, different energy. Drag the slider or press play to watch the neutron slow down (each collision cuts energy by a similar <i>factor</i>, so the slide is steady on a log scale).</p>
+<div class="row"><button class="p" id="play">▶ Slow down</button><button data-v="6.3">2 MeV</button><button data-v=".824">6.67 eV</button><button data-v="-1.597">0.025 eV</button></div>
+<input type="range" id="sl" min="-1.6" max="6.3" step=".01" value="6.3"><p id="ro"></p>
+<p class="mut">Curves are schematic. Weighted by abundance (5% / 95%), thermal U-235 fission beats U-238 capture by ~10:1; in the U-238 resonances (6.67 eV is the biggest) capture wins hugely.</p></div>
+<canvas id="c3" width="720" height="360"></canvas></section>
+
+<section class="slide"><div>
+<h2>4 · U-235 vs U-238, regime by regime</h2>
+<div class="row" id="rgb"></div><p id="rgt"></p>
+<p class="mut">Rounded evaluated-data values, for orientation. The resonance row uses lethargy-averaged values (the 6.67 eV peak itself reaches thousands of barns). Scattering = elastic + inelastic. Uranium atoms only; oxygen ignored.</p></div>
+<div id="rgp"></div></section>
+
+<section class="slide"><div>
+<h2>5 · Follow one neutron</h2>
+<p>Fuel rods (brown) sit in water. Colour shows energy: <b style="color:#e8341c">red = fast</b> → <b style="color:#2d6be0">blue = thermal</b>. Fission restarts the chain with a new 2 MeV neutron.</p>
+<div class="row"><button class="p" id="go">Launch neutron</button><select id="spd"><option value="1">1×</option><option value="2" selected>2×</option><option value="8">8×</option></select>
+<label><input type="checkbox" id="mod" checked> water moderator</label></div>
+<p id="st"></p><div id="lg"></div>
+<div class="row"><button id="cmp">Compare 300 neutrons</button></div><table id="tb"></table>
+<p class="mut">Toy model: simplified geometry and cross sections, for illustration only.</p></div>
+<div><canvas id="c4" width="720" height="400"></canvas></div></section>
+
+<section class="slide"><div>
+<h2>6 · The life, in short</h2>
+<ul><li><b>Born fast</b> (~2 MeV) from U-235 fission.</li>
+<li><b>Danger zone:</b> U-238 is ~95% of the fuel. It scatters fast neutrons, but its resonances (1 eV–10 keV) can swallow them.</li>
+<li><b>Moderator</b> (water) slows the neutron in ~20 collisions, quickly crossing the resonances.</li>
+<li><b>Thermal:</b> U-235’s fission cross section (~585 b) dwarfs U-238’s capture (~2.7 b), so even at 5% the neutron most often causes <b>another fission</b>.</li>
+<li><b>If captured by U-238</b> it isn’t wasted: it becomes Pu-239, which also fissions.</li></ul>
+<div class="row"><button class="p" onclick="go(0)">↺ Start over</button></div></div>
+<canvas id="c5" width="720" height="360" style="display:none"></canvas></section>
+</main>
+<footer><button id="prev">← Back</button><div class="dots" id="dots"></div><button id="next" class="p">Next →</button></footer>
+<script>
+const $=s=>document.querySelector(s),S=[...document.querySelectorAll(".slide")],D=$("#dots"),C=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+let cur=0;S.forEach((_,i)=>{const d=document.createElement("i");d.onclick=()=>go(i);D.append(d)});
+function go(i){cur=Math.max(0,Math.min(S.length-1,i));S.forEach((s,j)=>s.classList.toggle("on",j==cur));[...D.children].forEach((d,j)=>d.classList.toggle("on",j==cur));$("#prev").disabled=!cur;$("#next").disabled=cur==S.length-1;$("#pg").textContent=(cur+1)+" / "+S.length}
+$("#prev").onclick=()=>go(cur-1);$("#next").onclick=()=>go(cur+1);
+onkeydown=e=>{if(e.key=="ArrowRight")go(cur+1);if(e.key=="ArrowLeft")go(cur-1)};
+const fE=E=>E>=1e6?(E/1e6).toFixed(2)+" MeV":E>=1e3?(E/1e3).toFixed(1)+" keV":E>=10?E.toFixed(0)+" eV":E>=1?E.toFixed(1)+" eV":E.toFixed(3)+" eV";
+const hue=E=>`hsl(${220*(1-Math.min(1,Math.max(0,(Math.log10(E)+1.6)/7.9)))},85%,50%)`;
+const ci=(g,x,y,r,c)=>{g.fillStyle=c;g.beginPath();g.arc(x,y,r,0,7);g.fill()};
+/* slide 2 */
+$("#grid").innerHTML=Array.from({length:100},(_,i)=>`<i style="background:${[7,23,41,68,90].includes(i)?"#d63a2a":"#4a74b4"}"></i>`).join("");
+$("#cols").innerHTML=[["Hydrogen",18],["Water (H₂O)",20],["Heavy water",25],["Carbon",115],["U-238",2200]].map(a=>`<div>${a[0]}: ~${a[1].toLocaleString()}</div><div class="bar" style="width:${Math.log10(a[1])/3.4*100}%"></div>`).join("");
+/* slide 1 */
+const x1=$("#c1").getContext("2d");let a1=null;$("#fire").onclick=()=>{a1={t:0}};
+function draw1(dt){const x=x1,cx=420,cy=180,fg=C("--fg");x.clearRect(0,0,720,360);const a=a1;let t=0,r=34,cap="Press ‘Fire neutron’: a thermal neutron heads for a U-235 nucleus.";
+if(a){a.t+=dt;t=a.t;if(t>2&&!a.sp){a.sp=1;const n=Math.random()<.43?3:2,b=Math.random()*6.3;a.n=n;a.fr=[[-60,-25,"#8e44ad"],[60,25,"#16a085"]].map(f=>({x:cx,y:cy,vx:f[0],vy:f[1],c:f[2]}));a.nn=[...Array(n)].map((_,i)=>({vx:Math.cos(b+i*6.283/n)*300,vy:Math.sin(b+i*6.283/n)*300,x:cx,y:cy}))}}
+if(!a||t<2){const hot=a&&t>1.4;if(hot)r+=3*Math.sin(t*40);ci(x,cx,cy,r,hot?"#e67e22":"#c0392b");x.fillStyle=fg;x.font="14px system-ui";x.textAlign="center";x.fillText(hot?"U-236* (unstable)":"U-235",cx,cy+62);
+if(t<1.4){const px=60+(cx-r-66)*Math.min(1,t/1.4);ci(x,px,cy,6,"#2d6be0");x.fillText("thermal n",px,cy-18)}
+cap=t<1.4?(a?"A slow neutron approaches…":cap):"Absorbed! The nucleus wobbles and is about to split…"}
+else{a.fr.forEach(f=>{f.x+=f.vx*dt;f.y+=f.vy*dt;ci(x,f.x,f.y,26,f.c)});a.nn.forEach(n=>{n.x+=n.vx*dt;n.y+=n.vy*dt;x.strokeStyle="#e0a800";x.globalAlpha=.4;x.beginPath();x.moveTo(cx,cy);x.lineTo(n.x,n.y);x.stroke();x.globalAlpha=1;ci(x,n.x,n.y,6,"#f5c400")});
+cap=`Fission! Two fragments + ${a.n} prompt neutrons, each ≈2 MeV (~20,000 km/s). Average: 2.43 per fission.`}
+$("#cap1").textContent=cap}
+/* slide 3 */
+const x3=$("#c3").getContext("2d");let lv=6.3,pl=0;
+const RES=[[6.67,6e3],[20.9,3500],[36.7,4500],[66.3,1500],[80.7,800],[102.5,1200],[116.9,1500],[145,600],[190,500]];
+const sf5=E=>Math.max(1.2,585*Math.sqrt(.0253/E)),sc8b=E=>Math.max(.08,2.7*Math.sqrt(.0253/E));
+const sc8=E=>{let s=sc8b(E);for(const[e,p]of RES){const h=(.03+6e-4*e)/2;s+=p/(1+((E-e)/h)**2)}return s};
+$("#sl").oninput=e=>{lv=+e.target.value;pl=0};$("#play").onclick=()=>{lv=6.3;pl=1};
+document.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{lv=+b.dataset.v;pl=0;$("#sl").value=lv});
+function draw3(dt){if(pl){lv-=dt*.9;if(lv<-1.6){lv=-1.6;pl=0}$("#sl").value=lv}
+const x=x3,W=720,H=360,L=52,R=12,T=14,B=42,fg=C("--fg"),ln=C("--ln"),mu=C("--mut");x.clearRect(0,0,W,H);
+const X=v=>L+(v+3)/10*(W-L-R),Y=v=>T+(4.5-v)/5.5*(H-T-B);
+[[-3,-.3,"rgba(47,109,181,.13)","thermal"],[0,4,"rgba(230,160,30,.16)","resonances"],[5,7,"rgba(192,57,43,.13)","fast"]].forEach(z=>{x.fillStyle=z[2];x.fillRect(X(z[0]),T,X(z[1])-X(z[0]),H-T-B);x.fillStyle=mu;x.font="12px system-ui";x.textAlign="center";x.fillText(z[3],(X(z[0])+X(z[1]))/2,T+14)});
+x.strokeStyle=ln;x.fillStyle=mu;x.font="11px system-ui";for(let v=-3;v<=7;v++){x.beginPath();x.moveTo(X(v),T);x.lineTo(X(v),H-B);x.stroke();x.textAlign="center";x.fillText("1e"+v,X(v),H-B+14)}
+for(let v=-1;v<=4;v++){x.beginPath();x.moveTo(L,Y(v));x.lineTo(W-R,Y(v));x.stroke();x.textAlign="right";x.fillText("1e"+v,L-4,Y(v)+4)}
+x.textAlign="center";x.fillText("neutron energy (eV)",W/2,H-6);x.save();x.translate(12,H/2);x.rotate(-1.57);x.fillText("cross section (barns)",0,0);x.restore();
+const cv=(f,c)=>{x.strokeStyle=c;x.lineWidth=2;x.beginPath();for(let i=0;i<=400;i++){const v=-3+i/40,y=Y(Math.log10(f(10**v)));i?x.lineTo(X(v),y):x.moveTo(X(v),y)}x.stroke()};
+cv(sf5,C("--acc"));cv(sc8b,C("--b"));x.strokeStyle=C("--b");x.lineWidth=2.5;RES.forEach(([e,p])=>{x.beginPath();x.moveTo(X(Math.log10(e)),Y(Math.log10(sc8b(e))));x.lineTo(X(Math.log10(e)),Y(Math.log10(sc8b(e)+p)));x.stroke()});x.lineWidth=1;
+x.textAlign="left";x.fillStyle=C("--acc");x.fillText("U-235 fission",X(-2.9),Y(2.9));x.fillStyle=C("--b");x.fillText("U-238 capture + resonances",X(1.2),Y(4.2));
+const E=10**lv,f5=sf5(E),c8=sc8(E);x.strokeStyle=fg;x.setLineDash([4,4]);x.beginPath();x.moveTo(X(lv),T);x.lineTo(X(lv),H-B);x.stroke();x.setLineDash([]);ci(x,X(lv),Y(Math.log10(f5)),5,C("--acc"));ci(x,X(lv),Y(Math.log10(c8)),5,C("--b"));
+const f=.05*f5,c=.95*c8;$("#ro").innerHTML=`<b>E = ${fE(E)}</b><br>U-235 fission: 5% × ${f5.toPrecision(3)} b = ${f.toPrecision(3)}<br>U-238 capture: 95% × ${c8.toPrecision(3)} b = ${c.toPrecision(3)}<br>→ <b>${f>c?"fission wins "+(f/c).toFixed(1)+" : 1":"capture wins "+(c/f).toFixed(1)+" : 1"}</b>`}
+/* slide 4 */
+const x4=$("#c4").getContext("2d"),W=720,SH=340,FN={f5:"U-235 fission",f8:"U-238 fast fission",c8:"U-238 capture → Pu-239",c5:"U-235 capture (no fission)",capW:"captured in water",wan:"still wandering"};
+let mod=true,n4=null,lg=[],fl=[],gen=1,dots=[];
+[100,325,550].forEach(r=>{for(let i=0;i<10;i++)for(let j=0;j<22;j++)dots.push([r+6+i*6.5,8+j*15,(i*23+j*7)%20==0])});
+const inF=x=>((x-100)%225+225)%225<70,watt=()=>Math.min(1.2e7,-1e6*(Math.log(Math.random())+Math.log(Math.random())));
+const born=(x,y)=>({x,y,a:Math.random()*6.283,E:watt(),tr:[],n:0}),rf=()=>[[100,325,550][Math.random()*3|0]+Math.random()*70,10+Math.random()*(SH-20)];
+function coll(n,f){const E=n.E;
+if(!f){if(Math.random()<(E<1?.006:.0003))return"capW";if(Math.random()<.91){n.E=Math.max(.0253,E*Math.random());n.m="H in water: "+fE(E)+" → "+fE(n.E)}else{n.E=E*(.78+.22*Math.random());n.m="O in water: small loss"}return 0}
+const s5=sf5(E),w=[["f5",.05*s5],["c5",.0085*s5],["c8",.95*sc8(E)],["f8",E>1.2e6?.43:0],["in",E>4.5e4?2.3:0],["eO",7.6],["e8",9]];let t=0;w.forEach(q=>t+=q[1]);let r=Math.random()*t,k;for(k of w){if((r-=k[1])<0)break}k=k[0];
+if(k=="in"){n.E=E*(.05+.3*Math.random());n.m="U-238 inelastic: "+fE(E)+" → "+fE(n.E);return 0}
+if(k=="eO"){n.E=Math.max(.0253,E*(.78+.22*Math.random()));n.m="O in fuel: small loss";return 0}
+if(k=="e8"){n.E=Math.max(.0253,E*(.99+.01*Math.random()));n.m="U-238 elastic: almost no loss";return 0}return k}
+function step(n,ds){n.x+=Math.cos(n.a)*ds;n.y+=Math.sin(n.a)*ds;
+if(n.x<0||n.x>W){n.a=Math.PI-n.a;n.x=n.x<0?-n.x:2*W-n.x}if(n.y<0||n.y>SH){n.a=-n.a;n.y=n.y<0?-n.y:2*SH-n.y}
+const f=inF(n.x);if(!f&&!mod)return 0;if(Math.random()>ds/(f?20:12))return 0;n.a=Math.random()*6.283;n.n++;return coll(n,f)}
+const msg=t=>$("#st").textContent=t;
+function launch(){gen=1;lg=[];$("#lg").textContent="";const[x,y]=rf();n4=born(x,y);msg("A ~2 MeV neutron is born in a fission event.")}
+function end(r){if(r=="f5"||r=="f8"){fl.push({x:n4.x,y:n4.y,t:0});gen++;n4=born(n4.x,n4.y);msg("Generation "+gen+": fission! New fast neutron (we follow one of ~2.4).")}else{n4.dead=r;msg("Fate: "+FN[r]+" after "+n4.n+" collisions (generation "+gen+").")}}
+$("#go").onclick=launch;$("#mod").onchange=e=>{mod=e.target.checked;launch()};
+function batch(m,N){const o=mod;mod=m;const res={};for(let i=0;i<N;i++){const[x,y]=rf(),n=born(x,y);let r=0,s=0;while(!r&&s++<60000)r=step(n,4);r=r||"wan";res[r]=(res[r]||0)+1}mod=o;return res}
+$("#cmp").onclick=()=>{$("#tb").innerHTML="<tr><td>Running…</td></tr>";setTimeout(()=>{const A=batch(true,300),B=batch(false,300),k=r=>((2.43*(r.f5||0)+2.8*(r.f8||0))/300).toFixed(2);
+$("#tb").innerHTML="<tr><th>Fate of 300 fast neutrons</th><th>Water</th><th>No moderator</th></tr>"+["f5","f8","c8","c5","capW","wan"].map(f=>`<tr><td>${FN[f]}</td>${[A,B].map(r=>`<td>${Math.round((r[f]||0)/3)}%</td>`).join("")}</tr>`).join("")+`<tr><th>new neutrons per neutron</th><th>${k(A)}</th><th>${k(B)}</th></tr>`},30)};
+function draw4(dt){const x=x4,fg=C("--fg");x.clearRect(0,0,720,400);
+if(n4&&!n4.dead){const sp=+$("#spd").value;for(let i=0;i<sp*2;i++){const r=step(n4,2);if(i%2==0)n4.tr.push([n4.x,n4.y,n4.E]);if(n4.m){lg.unshift(n4.n+". "+n4.m);lg.length=Math.min(lg.length,6);n4.m=0;$("#lg").textContent=lg.join("\n")}if(r){end(r);break}}if(n4.tr.length>700)n4.tr.splice(0,n4.tr.length-700)}
+x.fillStyle=mod?C("--wat"):C("--card");x.fillRect(0,0,720,SH);x.fillStyle=C("--fuel");[100,325,550].forEach(r=>x.fillRect(r,0,70,SH));
+dots.forEach(d=>ci(x,d[0],d[1],d[2]?2.6:1.5,d[2]?"#d63a2a":"rgba(74,116,180,.6)"));
+x.fillStyle=fg;x.font="12px system-ui";x.textAlign="center";[[35,"edge"],[247,1],[472,1],[672,"edge"]].forEach(a=>{if(a[1]==1)x.fillText(mod?"water":"void",a[0],18)});
+if(n4){x.lineWidth=2;for(let i=1;i<n4.tr.length;i++){const p=n4.tr[i-1],q=n4.tr[i];if(Math.abs(p[0]-q[0])>50||Math.abs(p[1]-q[1])>50)continue;x.strokeStyle=hue(q[2]);x.globalAlpha=.2+.8*i/n4.tr.length;x.beginPath();x.moveTo(p[0],p[1]);x.lineTo(q[0],q[1]);x.stroke()}x.globalAlpha=1;
+ci(x,n4.x,n4.y,5.5,n4.dead?"#222":hue(n4.E));if(n4.dead){x.fillStyle="#fff";x.fillText("✕",n4.x,n4.y+4)}}
+fl.forEach(f=>{f.t+=dt*1.2;x.strokeStyle="#f5c400";x.globalAlpha=Math.max(0,1-f.t);x.lineWidth=3;x.beginPath();x.arc(f.x,f.y,f.t*50,0,7);x.stroke()});x.globalAlpha=1;fl=fl.filter(f=>f.t<1);
+const bx=40,bw=640,by=368;for(let i=0;i<bw;i+=2){x.fillStyle=hue(10**(7-i/bw*9));x.fillRect(bx+i,by,2,10)}
+x.fillStyle=fg;x.font="11px system-ui";[[6,"1 MeV"],[3,"1 keV"],[0,"1 eV"],[-1.6,"thermal"]].forEach(a=>x.fillText(a[1],bx+(7-a[0])/9*bw,by+24));
+x.textAlign="left";x.font="13px system-ui";if(n4){x.fillText(`E = ${fE(n4.E)}  ·  collisions: ${n4.n}  ·  generation ${gen}`,bx,by-22);const m=bx+(7-Math.log10(n4.E))/9*bw;x.beginPath();x.moveTo(m,by-2);x.lineTo(m-6,by-12);x.lineTo(m+6,by-12);x.fill()}}
+/* slide 4: regime comparison; a=U-235 [fission,capture,scatter], b=U-238 */
+const RG=[
+{n:"Thermal",r:"below 0.5 eV (0.025 eV)",a:[585,99,14],b:[0,2.7,9],t:"U-235 is a fission machine here: σf ≈ 585 b (rising as 1/v), and about 85% of its absorptions end in fission, releasing ~2.43 neutrons. U-238 can only capture (2.7 b) and cannot fission. Even at 5% abundance, U-235 wins."},
+{n:"Resonance",r:"1 eV – 10 keV",a:[30,15,10],b:[0,30,10],t:"U-238’s huge capture resonances (6.67, 20.9, 36.7 eV …) dominate, and 95% of the atoms are U-238, so a neutron here is most likely lost, becoming U-239 → Np-239 → Pu-239. U-235 has resonances too, but they add little. Water must carry the neutron through in ~10 collisions, and rod self-shielding helps."},
+{n:"Intermediate",r:"10 keV – 1 MeV",a:[1.5,.25,9],b:[0,.2,11],t:"All reactions are small and neutrons mostly scatter. U-238 inelastic scattering switches on near 45 keV and cuts neutron energy by a large factor per hit, but U-238 cannot fission yet and U-235 fission is only a few barns. Uranium alone cannot slow neutrons efficiently."},
+{n:"Fast",r:"above 1 MeV (2 MeV)",a:[1.2,.1,7],b:[.5,.07,7],t:"U-238 fission switches on above ~1 MeV (σf ≈ 0.5 b), a small bonus of extra fast fissions (fast fission factor ≈ 1.03). Inelastic scattering (~2.5 b) is the main way U-238 slows these neutrons. Still, over 90% of collisions are scatters, so fast neutrons rarely fission anything; moderate them."}];
+const lb=v=>v?Math.max(2,Math.min(100,(Math.log10(v)+1.5)/4.5*100)):0,
+br=(l,v,c)=>`<div style="display:flex;justify-content:space-between;font-size:.88rem"><span>${l}</span><span>${v?"≈ "+v+" b":"≈ 0"}</span></div><div class="bar" style="width:${lb(v)}%;background:${c}"></div>`,
+cl=["#c0392b","#4a74b4","#8b929c"],
+col=(t,A)=>`<div><h3>${t}</h3>${br("fission",A[0],cl[0])}${br("capture (n,γ)",A[1],cl[1])}${br("scattering",A[2],cl[2])}</div>`;
+function showRG(i){const g=RG[i],A=g.a,B=g.b,w=[0,1,2].map(k=>.05*A[k]+.95*B[k]),T=w[0]+w[1]+w[2],p=w.map(v=>100*v/T);
+$("#rgb").innerHTML=RG.map((q,j)=>`<button class="${j==i?"p":""}" onclick="showRG(${j})">${q.n}</button>`).join("");
+$("#rgt").innerHTML=`<b>${g.r}</b><br>${g.t}`;
+$("#rgp").innerHTML=`<div class="mut">cross sections per nucleus, log-scaled bars</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">${col("U-235 (5% of atoms)",A)}${col("U-238 (95% of atoms)",B)}</div><h4>Per 100 uranium collisions in 5% enriched fuel</h4><div style="display:flex;height:22px;border-radius:5px;overflow:hidden">${p.map((v,k)=>`<div style="width:${v}%;background:${cl[k]}"></div>`).join("")}</div><p>${p[0].toFixed(1)}% fission · ${p[1].toFixed(1)}% capture · ${p[2].toFixed(1)}% scatter${B[0]?`<br><span class="mut">${(95*B[0]/(5*A[0]+95*B[0])*100).toFixed(0)}% of these fissions are in U-238</span>`:""}</p>`}
+showRG(0);
+let last=0;function loop(t){const dt=Math.min(.05,(t-last)/1000||0);last=t;if(cur==0)draw1(dt);if(cur==2)draw3(dt);if(cur==4)draw4(dt);requestAnimationFrame(loop)}
+go(0);launch();requestAnimationFrame(loop);
+</script></body></html>
